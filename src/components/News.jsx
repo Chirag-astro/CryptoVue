@@ -1,36 +1,54 @@
-// import React, { useState, useEffect } from 'react';
-// import {Row,Col,Card,Select,Typography,Avatar,Spin} from 'antd';
-// import moment from 'moment';
-// import { useGetCryptoNewsQuery } from '../services/cryptoNewsApi';
+import React from 'react';
+import { Row, Col, Card, Typography, Spin } from 'antd';
+import moment from 'moment';
+import { useGetCryptoNewsQuery } from '../services/cryptoNewsApi';
 
-// const {Text,Title}= Typography;
-// const {Option} = Select;
+const { Text, Title } = Typography;
 
-// const News = ({simplified}) => {
-//   const count = simplified ? 6 : 30;
-//   const { data:cryptoNews} = useGetCryptoNewsQuery(count);
+const News = ({ simplified }) => {
+    const count = simplified ? 10 : 50;
 
- 
-//   if(!cryptoNews?.value)return 'Loading...'
- 
+  const { data: cryptoNews, isFetching } = useGetCryptoNewsQuery();
+  const filteredData = cryptoNews?.data?.slice(0, count);
 
- 
-//   return (
-//    <Row gutter={[24,24]}>
-//     {cryptoNews.value.map((news,i)=>(
-//       <Col xs={24} sm={12} lg={8} key={i}>
-//         <Card hoverable className='news-card'>
-//         <a href={news.url} target='_blank' rel="noreferrer">
-//           <div className='news-image-container'>
-//             <Title className='news-title' level={4}>{news.name}</Title>
-//           </div>
-//         </a>
-//         </Card>
-//       </Col>
 
-//     ))}
-//    </Row>
-//   )
-// }
+  if (isFetching) {
+    return (
+      <div className="loading-container">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
-// export default News
+  
+
+  return (
+    <Row gutter={[24, 24]}>
+      {filteredData.map((news, i) => (
+        <Col xs={24} sm={12} lg={8} key={i}>
+          <a href={news.url} target='_blank' rel="noreferrer">
+            <Card hoverable className='news-card'>
+              <div className='news-image-container'>
+                <img
+                  src={news.thumbnail || 'https://via.placeholder.com/160'}
+                  alt={news.title}
+                  className='news-image'
+                  style={{ objectFit: 'cover', height: '200px' }} 
+                />
+              </div>
+              <div className='news-text'>
+                <Title className='news-title' level={4}>{news.title}</Title>
+                <p>{news.description}</p>
+                <div className='provider-container'>
+                  <Text type='secondary'>{moment(news.createdAt).startOf('ss').fromNow()}</Text>
+                </div>
+              </div>
+            </Card>
+          </a>
+        </Col>
+      ))}
+    </Row>
+  );
+};
+
+export default News;
